@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Santi's Dashboard</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="index.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <h1>Santi's Dashboard</h1>
+      <div class="profile-subtitle">
+        <strong>Nicholas Santiago</strong> | Los Angeles, CA
+      </div>
+    </header>
+    <main>
+      <section>
+        <div id="xpDisplay">XP: 0</div>
+        <div id="levelDisplay">Level: 1</div>
+        <div id="strengthDisplay">Strength: 0</div>
+        <div id="disciplineDisplay">Discipline: 0</div>
+        <div id="intellectDisplay">Intellect: 0</div>
+        <div id="exerciseDisplay">Fitness: 0</div>
+        <div id="meditationDisplay">Mindfulness: 0</div>
+        <div id="wakeUpEarlyDisplay">Early Riser: 0</div>
+        <div id="stayUpLateDisplay">Late Nights: 0</div>
+        <div id="negativeSelfTalkDisplay">Self-Talk: 0</div>
+        <div id="junkFoodDisplay">Nutrition: 0</div>
+        <div id="impulseSpendingDisplay">Financial: 0</div>
+        <textarea id="dailyLog" rows="4" cols="40" placeholder="Daily log..."></textarea>
+        <div id="currentLogMessage">
+          <ul id="recentLogList"></ul>
+        </div>
+      </section>
+      <section>
+        <button id="actionBtn">Action</button>
+        <button id="readBtn">Read</button>
+        <button id="badHabitBtn">Procrastinate</button>
+        <button id="exerciseBtn">Exercise</button>
+        <button id="meditationBtn">Meditate</button>
+        <button id="wakeUpEarlyBtn">Wake Early</button>
+        <button id="stayUpLateBtn">Stay Up Late</button>
+        <button id="negativeSelfTalkBtn">Self-Talk</button>
+        <button id="junkFoodBtn">Junk Food</button>
+        <button id="impulseSpendingBtn">Spending</button>
+      </section>
+      <section>
+        <button id="resetBtn">Reset Stats</button>
+        <button id="clearLogBtn">Clear Log</button>
+        <button id="resetHistoryBtn">Clear History</button>
+      </section>
+      <section>
+        <h2>History</h2>
+        <pre id="logHistory"></pre>
+      </section>
+    </main>
+  </body>
+</html>

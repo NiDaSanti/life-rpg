@@ -1,0 +1,9 @@
+/* Netlify configuration for static site deployment */
+[build]
+  publish = "."
+  command = ""
+
+[dev]
+  command = ""
+  port = 8888
+  publish = "."

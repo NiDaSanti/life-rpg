@@ -1,0 +1,17 @@
+# Ignore developer documentation
+/dev-docs/
+
+# Node and build artifacts
+node_modules/
+*.log
+.DS_Store
+
+# Netlify and deployment
+.netlify/
+
+# OS and editor files
+*.swp
+*.swo
+.vscode/
+
+# No sensitive files for this static project

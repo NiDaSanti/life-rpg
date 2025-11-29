@@ -1,0 +1,8 @@
+{
+  "name": "life-stats",
+  "version": "1.0.0",
+  "description": "Terminal-style RPG stat tracker dashboard using localStorage only.",
+  "scripts": {},
+  "author": "Nicholas Santiago",
+  "license": "MIT"
+}
