@@ -54,6 +54,10 @@ const negativeSelfTalkDisplay = getElementOrWarn('negativeSelfTalkDisplay');
 const junkFoodDisplay = getElementOrWarn('junkFoodDisplay');
 const impulseSpendingDisplay = getElementOrWarn('impulseSpendingDisplay');
 const dailyLog = getElementOrWarn('dailyLog');
+// Stub for checkAchievements to prevent ReferenceError
+function checkAchievements() {
+  // Implement achievement logic here if needed
+}
 const logHistory = getElementOrWarn('logHistory');
 const currentLogMessage = getElementOrWarn('currentLogMessage');
 const recentLogList = getElementOrWarn('recentLogList');
@@ -70,7 +74,6 @@ const stayUpLateBtn = getElementOrWarn('stayUpLateBtn');
 const negativeSelfTalkBtn = getElementOrWarn('negativeSelfTalkBtn');
 const junkFoodBtn = getElementOrWarn('junkFoodBtn');
 const impulseSpendingBtn = getElementOrWarn('impulseSpendingBtn');
-const saveLogEntryBtn = getElementOrWarn('saveLogEntryBtn');
 const resetHistoryBtn = getElementOrWarn('resetHistoryBtn');
 
 // Daily and history log function
@@ -90,8 +93,9 @@ function dailyAndHistoryLog(actionType, message) {
         const currentHistory = logHistory.textContent;
         if (!currentHistory.includes(message.trim())) {
           logHistory.textContent += message;
-          localStorage.setItem(HISTORY_STORAGE_KEY, logHistory.textContent);
         }
+        // Always save history log after any update
+        localStorage.setItem('logHistory', logHistory.textContent);
       }
       break;
     default:
@@ -137,7 +141,7 @@ if (dailyLog) {
 
 // Load history log from localStorage
 if (logHistory) {
-  const savedHistory = localStorage.getItem(HISTORY_STORAGE_KEY);
+  const savedHistory = localStorage.getItem('logHistory');
   if (savedHistory !== null) logHistory.textContent = savedHistory;
 }
 
@@ -167,18 +171,18 @@ function animateStat(element, prefix, start, end, decimals = 0, duration = 500) 
 }
 
 function updateDisplay() {
-  animateStat(xpDisplay, 'XP', parseFloat(xpDisplay.textContent.split(': ')[1]) || 0, xp, 0);
-  animateStat(levelDisplay, 'Level', parseFloat(levelDisplay.textContent.split(': ')[1]) || 1, level, 0);
-  animateStat(strengthDisplay, 'Strength', parseFloat(strengthDisplay.textContent.split(': ')[1]) || 0, strength, 2);
-  animateStat(disciplineDisplay, 'Discipline (Marine)', parseFloat(disciplineDisplay.textContent.split(': ')[1]) || 0, discipline, 2);
-  animateStat(intellectDisplay, 'Intellect (Coding)', parseFloat(intellectDisplay.textContent.split(': ')[1]) || 0, intellect, 2);
-  animateStat(exerciseDisplay, 'Physical Fitness', parseFloat(exerciseDisplay.textContent.split(': ')[1]) || 0, exercise, 2);
-  animateStat(meditationDisplay, 'Mindfulness', parseFloat(meditationDisplay.textContent.split(': ')[1]) || 0, meditation, 2);
-  animateStat(wakeUpEarlyDisplay, 'Early Riser', parseFloat(wakeUpEarlyDisplay.textContent.split(': ')[1]) || 0, wakeUpEarly, 2);
-  animateStat(stayUpLateDisplay, 'Late Nights', parseFloat(stayUpLateDisplay.textContent.split(': ')[1]) || 0, stayUpLate, 2);
-  animateStat(negativeSelfTalkDisplay, 'Self-Talk', parseFloat(negativeSelfTalkDisplay.textContent.split(': ')[1]) || 0, negativeSelfTalk, 2);
-  animateStat(junkFoodDisplay, 'Nutrition', parseFloat(junkFoodDisplay.textContent.split(': ')[1]) || 0, junkFood, 2);
-  animateStat(impulseSpendingDisplay, 'Financial Discipline', parseFloat(impulseSpendingDisplay.textContent.split(': ')[1]) || 0, impulseSpending, 2);
+  animateStat(xpDisplay, '🟢 XP', parseFloat(xpDisplay.textContent.split(': ')[1]) || 0, xp, 0);
+  animateStat(levelDisplay, '🏆 Level', parseFloat(levelDisplay.textContent.split(': ')[1]) || 1, level, 0);
+  animateStat(strengthDisplay, '💪 Strength', parseFloat(strengthDisplay.textContent.split(': ')[1]) || 0, strength, 2);
+  animateStat(disciplineDisplay, '🎯 Discipline', parseFloat(disciplineDisplay.textContent.split(': ')[1]) || 0, discipline, 2);
+  animateStat(intellectDisplay, '🧠 Intellect', parseFloat(intellectDisplay.textContent.split(': ')[1]) || 0, intellect, 2);
+  animateStat(exerciseDisplay, '🏃 Fitness', parseFloat(exerciseDisplay.textContent.split(': ')[1]) || 0, exercise, 2);
+  animateStat(meditationDisplay, '🧘 Mindfulness', parseFloat(meditationDisplay.textContent.split(': ')[1]) || 0, meditation, 2);
+  animateStat(wakeUpEarlyDisplay, '🌅 Early Riser', parseFloat(wakeUpEarlyDisplay.textContent.split(': ')[1]) || 0, wakeUpEarly, 2);
+  animateStat(stayUpLateDisplay, '🌙 Late Nights', parseFloat(stayUpLateDisplay.textContent.split(': ')[1]) || 0, stayUpLate, 2);
+  animateStat(negativeSelfTalkDisplay, '😞 Self-Talk', parseFloat(negativeSelfTalkDisplay.textContent.split(': ')[1]) || 0, negativeSelfTalk, 2);
+  animateStat(junkFoodDisplay, '🍔 Nutrition', parseFloat(junkFoodDisplay.textContent.split(': ')[1]) || 0, junkFood, 2);
+  animateStat(impulseSpendingDisplay, '💸 Financial', parseFloat(impulseSpendingDisplay.textContent.split(': ')[1]) || 0, impulseSpending, 2);
 }
 
 function saveState() {
@@ -228,43 +232,50 @@ function loadState() {
 }
   // Show startup info about localStorage
   window.addEventListener('DOMContentLoaded', () => {
-    // Create terminal-style modal
-    const modal = document.createElement('div');
-    modal.style.position = 'fixed';
-    modal.style.top = '0';
-    modal.style.left = '0';
-    modal.style.width = '100vw';
-    modal.style.height = '100vh';
-    modal.style.background = 'rgba(17, 17, 17, 0.98)';
-    modal.style.display = 'flex';
-    modal.style.alignItems = 'center';
-    modal.style.justifyContent = 'center';
-    modal.style.zIndex = '9999';
+    // Show welcome modal only once per session
+    if (!sessionStorage.getItem('welcomeModalShown')) {
+      const modal = document.createElement('div');
+      modal.style.position = 'fixed';
+      modal.style.top = '0';
+      modal.style.left = '0';
+      modal.style.width = '100vw';
+      modal.style.height = '100vh';
+      modal.style.background = 'rgba(17, 17, 17, 0.98)';
+      modal.style.display = 'flex';
+      modal.style.alignItems = 'center';
+      modal.style.justifyContent = 'center';
+      modal.style.zIndex = '9999';
 
-    const box = document.createElement('div');
-    box.style.background = '#111';
-    box.style.border = '2px solid #00ff41';
-    box.style.borderRadius = '10px';
-    box.style.boxShadow = '0 0 24px #00ff4144';
-    box.style.padding = '2rem 2.5rem';
-    box.style.color = '#00ff41';
-    box.style.fontFamily = "Fira Mono, Menlo, Consolas, monospace";
-    box.style.fontSize = '1.15rem';
-    box.style.textAlign = 'center';
-    box.innerHTML = `<span style='font-size:1.3rem;font-weight:bold;'>Welcome!</span><br><br>This dashboard uses your browser's <span style='color:#fff;'>localStorage</span> only.<br>No data is sent to any server or database.<br><br><button id='closeModalBtn' style='margin-top:1.5rem;background:#111;color:#00ff41;border:1px solid #00ff41;border-radius:6px;padding:0.5rem 1.2rem;font-family:inherit;font-size:1rem;cursor:pointer;'>OK</button>`;
+      const box = document.createElement('div');
+      box.style.background = '#111';
+      box.style.border = '2px solid #00ff41';
+      box.style.borderRadius = '10px';
+      box.style.boxShadow = '0 0 24px #00ff4144';
+      box.style.padding = '2rem 2.5rem';
+      box.style.color = '#00ff41';
+      box.style.fontFamily = "Fira Mono, Menlo, Consolas, monospace";
+      box.style.fontSize = '1.15rem';
+      box.style.textAlign = 'center';
+      box.innerHTML = `<span style='font-size:1.3rem;font-weight:bold;'>Welcome!</span><br><br>This dashboard uses your browser's <span style='color:#fff;'>localStorage</span> only.<br>No data is sent to any server or database.<br><br><button id='closeModalBtn' style='margin-top:1.5rem;background:#111;color:#00ff41;border:1px solid #00ff41;border-radius:6px;padding:0.5rem 1.2rem;font-family:inherit;font-size:1rem;cursor:pointer;'>OK</button>`;
 
-    modal.appendChild(box);
-    document.body.appendChild(modal);
-    document.getElementById('closeModalBtn').onclick = function() {
-      modal.remove();
-    };
+      modal.appendChild(box);
+      document.body.appendChild(modal);
+      document.getElementById('closeModalBtn').onclick = function() {
+        modal.remove();
+      };
+      sessionStorage.setItem('welcomeModalShown', 'true');
+    }
     loadState();
   });
 
 // Action button event: slow stat progression
 actionBtn.addEventListener('click', () => {
-  xp = Math.min(xp + 2, MAX_XP);
-  level = Math.floor(xp / 10) + 1;
+  xp += 2;
+  const xpRequired = 100 * level;
+  if (xp >= xpRequired) {
+    xp = 0;
+    level += 1;
+  }
   strength = parseFloat(Math.min(strength + 0.1, MAX_STRENGTH).toFixed(2));
   discipline = parseFloat(Math.min(discipline + 0.1, MAX_DISCIPLINE).toFixed(2));
 
@@ -277,8 +288,12 @@ actionBtn.addEventListener('click', () => {
 
   // Read button event: slow stat progression
 readBtn.addEventListener('click', () => {
-  xp = Math.min(xp + 3, MAX_XP);
-  level = Math.floor(xp / 100) + 1;
+  xp += 3;
+  const xpRequired = 100 * level;
+  if (xp >= xpRequired) {
+    xp = 0;
+    level += 1;
+  }
     intellect = parseFloat(Math.min(intellect + 0.2, MAX_INTELLECT).toFixed(2));
     discipline = parseFloat(Math.min(discipline + 0.05, MAX_DISCIPLINE).toFixed(2));
 
@@ -290,11 +305,15 @@ readBtn.addEventListener('click', () => {
 });
 
 // Add button to save daily log entry to log history
-if (!document.getElementById('saveLogEntryBtn')) {
-  const saveLogEntryBtn = document.createElement('button');
+// Ensure saveLogEntryBtn exists and add event listener
+let saveLogEntryBtn = document.getElementById('saveLogEntryBtn');
+if (!saveLogEntryBtn && dailyLog) {
+  saveLogEntryBtn = document.createElement('button');
   saveLogEntryBtn.id = 'saveLogEntryBtn';
   saveLogEntryBtn.textContent = 'Add to Log History';
   dailyLog.parentNode.insertBefore(saveLogEntryBtn, dailyLog.nextSibling);
+}
+if (saveLogEntryBtn) {
   saveLogEntryBtn.addEventListener('click', () => {
     if (dailyLog && dailyLog.value.trim() !== '') {
       const submittedMsg = dailyLog.value.trim();
@@ -354,6 +373,7 @@ resetHistoryBtn.addEventListener('click', () => {
     if (confirmed) {
       localStorage.removeItem(HISTORY_STORAGE_KEY);
       if (logHistory) logHistory.textContent = '';
+      console.log('[DEBUG] Log history cleared by user action.');
     }
   });
 });
@@ -362,7 +382,12 @@ resetHistoryBtn.addEventListener('click', () => {
 // Unified stat button logic with XP metrics
 exerciseBtn.addEventListener('click', () => {
   exercise = Math.min(exercise + 0.2, MAX_EXERCISE);
-  xp = Math.min(xp + 1, MAX_XP);
+  xp += 1;
+  const xpRequired = 100 * level;
+  if (xp >= xpRequired) {
+    xp = 0;
+    level += 1;
+  }
   logAction('Exercised');
   dailyAndHistoryLog('history', `\n[${new Date().toLocaleString()}] Exercised.`);
   updateDisplay();
@@ -370,7 +395,12 @@ exerciseBtn.addEventListener('click', () => {
 });
 meditationBtn.addEventListener('click', () => {
   meditation = Math.min(meditation + 0.2, MAX_MEDITATION);
-  xp = Math.min(xp + 1, MAX_XP);
+  xp += 1;
+  const xpRequired = 100 * level;
+  if (xp >= xpRequired) {
+    xp = 0;
+    level += 1;
+  }
   logAction('Meditated');
   dailyAndHistoryLog('history', `\n[${new Date().toLocaleString()}] Meditated.`);
   updateDisplay();
@@ -378,7 +408,12 @@ meditationBtn.addEventListener('click', () => {
 });
 wakeUpEarlyBtn.addEventListener('click', () => {
   wakeUpEarly = Math.min(wakeUpEarly + 0.2, MAX_WAKEUP_EARLY);
-  xp = Math.min(xp + 1, MAX_XP);
+  xp += 1;
+  const xpRequired = 100 * level;
+  if (xp >= xpRequired) {
+    xp = 0;
+    level += 1;
+  }
   logAction('Woke Up Early');
   dailyAndHistoryLog('history', `\n[${new Date().toLocaleString()}] Woke Up Early.`);
   updateDisplay();
@@ -386,6 +421,7 @@ wakeUpEarlyBtn.addEventListener('click', () => {
 });
 stayUpLateBtn.addEventListener('click', () => {
   stayUpLate = Math.max(stayUpLate - 0.2, 0);
+  discipline = Math.max(discipline - 0.1, 0);
   xp = Math.max(xp - 1, 0);
   logAction('Stayed Up Late');
   dailyAndHistoryLog('history', `\n[${new Date().toLocaleString()}] Stayed Up Late.`);
@@ -394,6 +430,7 @@ stayUpLateBtn.addEventListener('click', () => {
 });
 negativeSelfTalkBtn.addEventListener('click', () => {
   negativeSelfTalk = Math.max(negativeSelfTalk + 0.2, 0);
+  discipline = Math.max(discipline - 0.1, 0);
   xp = Math.max(xp - 1, 0);
   logAction('Negative Self-Talk');
   dailyAndHistoryLog('history', `\n[${new Date().toLocaleString()}] Negative Self-Talk.`);
@@ -402,6 +439,7 @@ negativeSelfTalkBtn.addEventListener('click', () => {
 });
 junkFoodBtn.addEventListener('click', () => {
   junkFood = Math.max(junkFood + 0.2, 0);
+  discipline = Math.max(discipline - 0.1, 0);
   xp = Math.max(xp - 1, 0);
   logAction('Ate Junk Food');
   dailyAndHistoryLog('history', `\n[${new Date().toLocaleString()}] Ate Junk Food.`);
@@ -410,6 +448,7 @@ junkFoodBtn.addEventListener('click', () => {
 });
 impulseSpendingBtn.addEventListener('click', () => {
   impulseSpending = Math.max(impulseSpending + 0.2, 0);
+  discipline = Math.max(discipline - 0.1, 0);
   xp = Math.max(xp - 1, 0);
   logAction('Impulse Spending');
   dailyAndHistoryLog('history', `\n[${new Date().toLocaleString()}] Impulse Spending.`);
