@@ -60,7 +60,7 @@ const recentLogList = getElementOrWarn('recentLogList');
 
 const actionBtn = getElementOrWarn('actionBtn');
 const readBtn = getElementOrWarn('readBtn');
-const badHabitBtn = getElementOrWarn('badHabitBtn');
+// Removed unused badHabitBtn
 const resetBtn = getElementOrWarn('resetBtn');
 const clearLogBtn = getElementOrWarn('clearLogBtn');
 const exerciseBtn = getElementOrWarn('exerciseBtn');
@@ -86,8 +86,12 @@ function dailyAndHistoryLog(actionType, message) {
     case 'history':
       // Append to history log and save
       if (logHistory && typeof message === 'string') {
-        logHistory.textContent += message;
-        localStorage.setItem(HISTORY_STORAGE_KEY, logHistory.textContent);
+        // Prevent duplicate history messages
+        const currentHistory = logHistory.textContent;
+        if (!currentHistory.includes(message.trim())) {
+          logHistory.textContent += message;
+          localStorage.setItem(HISTORY_STORAGE_KEY, logHistory.textContent);
+        }
       }
       break;
     default:
@@ -184,7 +188,13 @@ function saveState() {
     strength,
     discipline,
     intellect,
-    ...stats
+    exercise,
+    meditation,
+    wakeUpEarly,
+    stayUpLate,
+    negativeSelfTalk,
+    junkFood,
+    impulseSpending
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 };
@@ -306,50 +316,106 @@ if (!document.getElementById('saveLogEntryBtn')) {
 }
 
 resetBtn.addEventListener('click', () => {
-  if (confirm('Are you sure you want to reset all stats?')) {
-    xp = 0;
-    level = 1;
-    strength = 0;
-    discipline = 0;
-    intellect = 0;
-    exercise = 0;
-    meditation = 0;
-    wakeUpEarly = 0;
-    stayUpLate = 0;
-    negativeSelfTalk = 0;
-    junkFood = 0;
-    impulseSpending = 0;
-    localStorage.removeItem(STORAGE_KEY);
-    updateDisplay();
-    saveState();
-  }
+  showTerminalConfirm('Are you sure you want to reset all stats?', (confirmed) => {
+    if (confirmed) {
+      xp = 0;
+      level = 1;
+      strength = 0;
+      discipline = 0;
+      intellect = 0;
+      exercise = 0;
+      meditation = 0;
+      wakeUpEarly = 0;
+      stayUpLate = 0;
+      negativeSelfTalk = 0;
+      junkFood = 0;
+      impulseSpending = 0;
+      localStorage.removeItem(STORAGE_KEY);
+      updateDisplay();
+      saveState();
+    }
+  });
 });
 
 clearLogBtn.addEventListener('click', () => {
-  if (confirm('Clear daily log and recent entries?')) {
-    if (dailyLog) dailyLog.value = '';
-    localStorage.removeItem(LOG_STORAGE_KEY);
-    localStorage.removeItem('recentLogs');
-    if (typeof renderRecentLogs === 'function') renderRecentLogs();
-    if (currentLogMessage) currentLogMessage.textContent = 'Your latest log will appear here.';
-  }
+  showTerminalConfirm('Clear daily log and recent entries?', (confirmed) => {
+    if (confirmed) {
+      if (dailyLog) dailyLog.value = '';
+      localStorage.removeItem(LOG_STORAGE_KEY);
+      localStorage.removeItem('recentLogs');
+      if (typeof renderRecentLogs === 'function') renderRecentLogs();
+      if (currentLogMessage) currentLogMessage.textContent = 'Your latest log will appear here.';
+    }
+  });
 });
 
 resetHistoryBtn.addEventListener('click', () => {
-  if (confirm('Are you sure you want to reset all log history?')) {
-    localStorage.removeItem(HISTORY_STORAGE_KEY);
-    if (logHistory) logHistory.textContent = '';
-  }
+  showTerminalConfirm('Are you sure you want to reset all log history?', (confirmed) => {
+    if (confirmed) {
+      localStorage.removeItem(HISTORY_STORAGE_KEY);
+      if (logHistory) logHistory.textContent = '';
+    }
+  });
 });
 
-// Habit stat triggers
-exerciseBtn.addEventListener('click', () => handleHabit('exercise', MAX_EXERCISE, 'Exercised', true));
-meditationBtn.addEventListener('click', () => handleHabit('meditation', MAX_MEDITATION, 'Meditated', true));
-wakeUpEarlyBtn.addEventListener('click', () => handleHabit('wakeUpEarly', MAX_WAKEUP_EARLY, 'Woke Up Early', true));
-stayUpLateBtn.addEventListener('click', () => handleHabit('stayUpLate', MAX_STAYUP_LATE, 'Stayed Up Late', false));
-negativeSelfTalkBtn.addEventListener('click', () => handleHabit('negativeSelfTalk', MAX_NEGATIVE_SELF_TALK, 'Negative Self-Talk', false));
-junkFoodBtn.addEventListener('click', () => handleHabit('junkFood', MAX_JUNKFOOD, 'Ate Junk Food', false));
-impulseSpendingBtn.addEventListener('click', () => handleHabit('impulseSpending', MAX_IMPULSE_SPENDING, 'Impulse Spending', false));
+
+// Unified stat button logic with XP metrics
+exerciseBtn.addEventListener('click', () => {
+  exercise = Math.min(exercise + 0.2, MAX_EXERCISE);
+  xp = Math.min(xp + 1, MAX_XP);
+  logAction('Exercised');
+  dailyAndHistoryLog('history', `\n[${new Date().toLocaleString()}] Exercised.`);
+  updateDisplay();
+  saveState();
+});
+meditationBtn.addEventListener('click', () => {
+  meditation = Math.min(meditation + 0.2, MAX_MEDITATION);
+  xp = Math.min(xp + 1, MAX_XP);
+  logAction('Meditated');
+  dailyAndHistoryLog('history', `\n[${new Date().toLocaleString()}] Meditated.`);
+  updateDisplay();
+  saveState();
+});
+wakeUpEarlyBtn.addEventListener('click', () => {
+  wakeUpEarly = Math.min(wakeUpEarly + 0.2, MAX_WAKEUP_EARLY);
+  xp = Math.min(xp + 1, MAX_XP);
+  logAction('Woke Up Early');
+  dailyAndHistoryLog('history', `\n[${new Date().toLocaleString()}] Woke Up Early.`);
+  updateDisplay();
+  saveState();
+});
+stayUpLateBtn.addEventListener('click', () => {
+  stayUpLate = Math.max(stayUpLate - 0.2, 0);
+  xp = Math.max(xp - 1, 0);
+  logAction('Stayed Up Late');
+  dailyAndHistoryLog('history', `\n[${new Date().toLocaleString()}] Stayed Up Late.`);
+  updateDisplay();
+  saveState();
+});
+negativeSelfTalkBtn.addEventListener('click', () => {
+  negativeSelfTalk = Math.max(negativeSelfTalk + 0.2, 0);
+  xp = Math.max(xp - 1, 0);
+  logAction('Negative Self-Talk');
+  dailyAndHistoryLog('history', `\n[${new Date().toLocaleString()}] Negative Self-Talk.`);
+  updateDisplay();
+  saveState();
+});
+junkFoodBtn.addEventListener('click', () => {
+  junkFood = Math.max(junkFood + 0.2, 0);
+  xp = Math.max(xp - 1, 0);
+  logAction('Ate Junk Food');
+  dailyAndHistoryLog('history', `\n[${new Date().toLocaleString()}] Ate Junk Food.`);
+  updateDisplay();
+  saveState();
+});
+impulseSpendingBtn.addEventListener('click', () => {
+  impulseSpending = Math.max(impulseSpending + 0.2, 0);
+  xp = Math.max(xp - 1, 0);
+  logAction('Impulse Spending');
+  dailyAndHistoryLog('history', `\n[${new Date().toLocaleString()}] Impulse Spending.`);
+  updateDisplay();
+  saveState();
+});
 
 function handleHabit(stat, max, logMsg, isGood = true) {
   switch (stat) {
@@ -389,4 +455,41 @@ function handleHabit(stat, max, logMsg, isGood = true) {
   dailyAndHistoryLog('history', `\n[${new Date().toLocaleString()}] ${logMsg}.`);
   updateDisplay();
   saveState();
+}
+
+function showTerminalConfirm(message, callback) {
+  const modal = document.createElement('div');
+  modal.style.position = 'fixed';
+  modal.style.top = '0';
+  modal.style.left = '0';
+  modal.style.width = '100vw';
+  modal.style.height = '100vh';
+  modal.style.background = 'rgba(17, 17, 17, 0.98)';
+  modal.style.display = 'flex';
+  modal.style.alignItems = 'center';
+  modal.style.justifyContent = 'center';
+  modal.style.zIndex = '9999';
+
+  const box = document.createElement('div');
+  box.style.background = '#111';
+  box.style.border = '2px solid #00ff41';
+  box.style.borderRadius = '10px';
+  box.style.boxShadow = '0 0 24px #00ff4144';
+  box.style.padding = '2rem 2.5rem';
+  box.style.color = '#00ff41';
+  box.style.fontFamily = "Fira Mono, Menlo, Consolas, monospace";
+  box.style.fontSize = '1.15rem';
+  box.style.textAlign = 'center';
+  box.innerHTML = `<span style='font-size:1.1rem;font-weight:bold;'>Warning</span><br><br>${message}<br><br><button id='confirmYes' style='margin-right:1rem;background:#111;color:#00ff41;border:1px solid #00ff41;border-radius:6px;padding:0.5rem 1.2rem;font-family:inherit;font-size:1rem;cursor:pointer;'>Yes</button><button id='confirmNo' style='background:#111;color:#00ff41;border:1px solid #00ff41;border-radius:6px;padding:0.5rem 1.2rem;font-family:inherit;font-size:1rem;cursor:pointer;'>No</button>`;
+
+  modal.appendChild(box);
+  document.body.appendChild(modal);
+  document.getElementById('confirmYes').onclick = function() {
+    modal.remove();
+    callback(true);
+  };
+  document.getElementById('confirmNo').onclick = function() {
+    modal.remove();
+    callback(false);
+  };
 }
