@@ -5,6 +5,7 @@ body {
   padding: 0;
   color: #00ff41;
   min-width: 0;
+  overflow-x: hidden;
 }
 
 header {
@@ -32,7 +33,7 @@ header h1 {
 }
 
 main {
-  max-width: 1200px;
+  max-width: 700px;
   width: 98vw;
   margin: 2rem auto;
   background: #111;
@@ -42,6 +43,7 @@ main {
   color: #00ff41;
   border: 1px solid #00ff41;
   min-width: 0;
+  overflow-x: auto;
 }
 
 section {
@@ -53,6 +55,7 @@ section {
   padding: 1.2rem 1rem;
   border: 1px solid #00ff41;
   min-width: 0;
+  overflow-x: auto;
 }
 
 .stats-grid {
@@ -61,6 +64,7 @@ section {
   gap: 0.7rem;
   margin-bottom: 1rem;
   min-width: 0;
+  overflow-x: auto;
 }
 
 .stat-card {
@@ -76,6 +80,7 @@ section {
   margin-bottom: 0.3rem;
   border: 1px solid #00ff41;
   min-width: 0;
+  overflow-x: auto;
 }
 
 textarea {
@@ -90,6 +95,7 @@ textarea {
   color: #00ff41;
   transition: border 0.2s;
   min-width: 0;
+  overflow-x: auto;
 }
 
 button {
@@ -106,6 +112,7 @@ button {
   transition: background 0.2s, transform 0.1s;
   font-family: inherit;
   min-width: 0;
+  overflow-x: auto;
 }
 
 button:hover {
@@ -126,6 +133,7 @@ button:hover {
   box-shadow: 0 1px 4px #00ff4122;
   width: 100%;
   min-width: 0;
+  overflow-x: auto;
 }
 
 #recentLogList {
@@ -134,6 +142,7 @@ button:hover {
   color: #00ff41;
   font-size: 1rem;
   min-width: 0;
+  overflow-x: auto;
 }
 
 #logHistory {
